@@ -1,43 +1,72 @@
+import pyodbc
+import WeightCalculations as wc
+import GraphWLDB as gwl
+from datetime import date, datetime
+from pandas import read_csv, read_sql_query
 
 
-# calculate Basal Metabolic Rate
-# weight is in kg, height is in cm
-def BMR(gender, age, weight, height):
-	calc = 10*weight + 6.25*height - 5*age
-	if gender == 'Male':
-		return calc + 5
+# WeightLoss database manager
+class WeightLossDB(object):
 
-	elif gender == 'Female':
-		return calc - 161
+	####################################################################################################
+	### init
+	def __init__(self):
 
-	else:
-		print('Error: gender must be either Male or Female')
-		exit()
+		# connect to SQL Server
+		self.connection = None
+		try:
+			self.connection = pyodbc.connect('Driver={SQL Server};'
+							'Server=DESKTOP-NPQM960;'
+							'Trusted_Connection=yes;')
+			print("Successfully connected to SQL Server!")
+		except:
+			print("Connection to SQL Server failed!");  exit()
+
+		if self.connection is not None:
+			self.connection.autocommit = True
+
+		# place cursor on WeightLoss database
+		self.cursor = self.connection.cursor()
+		self.cursor.execute("SELECT name FROM master.dbo.sysdatabases where name=?;", ("WeightLoss"))
+
+		data = self.cursor.fetchall()
+
+		# if database already exists
+		if data:
+			print("Database found successfully.")
+
+		# if database does not already exist, create database and tables
+		else:
+			print("WeightLoss database does not yet exist....creating...")
+			self.cursor.execute("CREATE DATABASE WeightLoss")
+			self.cursor.execute("CREATE TABLE Users (uid INTEGER PRIMARY KEY, name varchar(25), sex CHAR(1), "
+					+ "birthday date, height real, CHECK (sex in ('M', 'F') AND height > 0));")
+
+			self.cursor.execute("CREATE TABLE EntryLogs (lid INTEGER PRIMARY KEY, uid integer, date date, "
+					+ "weight real, FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
+					+ "CHECK (weight > 0));")
+
+	### end init
+	####################################################################################################
+
+	# add multiple new users from CSV file (without using User Interface)
+	# each line of CSV file must be in form 'name,sex,birthday,height'
+	def newUser(self, filePath, dateFormat="%m/%d/%Y"):
+		data = read_csv(filePath)
+		for index,row in data.iterrows():
+			lastIndex = self.cursor.execute("SELECT MAX(uid) FROM Users;").fetchall()[0][0]
+			uid = int(lastIndex) + 1 if lastIndex is not None else 1
+			self.cursor.execute("INSERT INTO Users(uid,name,sex,birthday,height) VALUES (?,?,?,?,?)",
+					(uid, row['name'], row['sex'], datetime.strptime(row['birthday'], dateFormat), row['height']))
 
 
 
-def CaloricNeeds(gender, age, weight, height, activity_level):
-	multiplier = 0.0
-	if activity_level == 'sedentary':
-		multiplier = 1.2
-	elif activity_level == 'lightly active':
-		multiplier = 1.375
-	elif activity_level == 'moderately active':
-		multiplier = 1.55
-	elif activity_level == 'hard exercise':
-		multiplier = 1.725
-	elif activity_level == 'very hard exercise':
-		multiplier = 1.9
-	return multiplier*BMR(gender, age, weight, height)
-
-
-
-if __name__ == '__main__':
-  # example
-	gender = 'Female'
-	age = 20
-	weight = 56.425
-	height = 152.4
-	activity_level = 'sedentary'
-	print(BMR(gender, age, weight, height))
-	print(CaloricNeeds(gender, age, weight, height, activity_level))
+	# add multiple EntryLogs *for previous users* from CSV file (without using User Interface)
+	# each line of CSV file must be in form 'uid,date,weight'
+	def addEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
+		data = read_csv(filePath)
+		for index,row in data.iterrows():
+			lastIndex = self.cursor.execute("SELECT MAX(lid) FROM EntryLogs;").fetchall()[0][0]
+			lid = int(lastIndex) + 1 if lastIndex is not None else 1
+			self.cursor.execute("INSERT INTO EntryLogs(lid, uid, date, weight) VALUES (?,?,?,?)",
+					(lid, row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
