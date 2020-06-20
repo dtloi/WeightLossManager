@@ -1,72 +1,49 @@
-import pyodbc
-import WeightCalculations as wc
-import GraphWLDB as gwl
-from datetime import date, datetime
-from pandas import read_csv, read_sql_query
 
 
-# WeightLoss database manager
-class WeightLossDB(object):
+# calculate the user's Basal Metabolic Rate
+# default weight is in lbs, default height is in inches
+def BMR(sex, age, weight, height, units=('lbs', 'inches')):
 
-	####################################################################################################
-	### init
-	def __init__(self):
+	# if weight in pounds, convert to kg
+	if units[0] == 'lbs':
+		weight *= 0.453592
+	elif units[0] != 'kg':
+		print("Error: weight must be in either lbs or kg");  exit()
 
-		# connect to SQL Server
-		self.connection = None
-		try:
-			self.connection = pyodbc.connect('Driver={SQL Server};'
-							'Server=DESKTOP-NPQM960;'
-							'Trusted_Connection=yes;')
-			print("Successfully connected to SQL Server!")
-		except:
-			print("Connection to SQL Server failed!");  exit()
+	# convert inches to centimeters
+	if units[1] == 'inches':
+		height *= 2.54
+	elif units[1] != 'cm':
+		print("Error: height must be in either inches or cm");  exit()
 
-		if self.connection is not None:
-			self.connection.autocommit = True
+	main_calculation = 10*weight + 6.25*height - 5*age
 
-		# place cursor on WeightLoss database
-		self.cursor = self.connection.cursor()
-		self.cursor.execute("SELECT name FROM master.dbo.sysdatabases where name=?;", ("WeightLoss"))
+	# the sex of the user creates either a bonus or decrease to the permitted-calorie calculation
+	if sex.upper() == 'M':
+		return main_calculation + 5
 
-		data = self.cursor.fetchall()
+	elif sex.upper() == 'F':
+		return main_calculation - 161
 
-		# if database already exists
-		if data:
-			print("Database found successfully.")
-
-		# if database does not already exist, create database and tables
-		else:
-			print("WeightLoss database does not yet exist....creating...")
-			self.cursor.execute("CREATE DATABASE WeightLoss")
-			self.cursor.execute("CREATE TABLE Users (uid INTEGER PRIMARY KEY, name varchar(25), sex CHAR(1), "
-					+ "birthday date, height real, CHECK (sex in ('M', 'F') AND height > 0));")
-
-			self.cursor.execute("CREATE TABLE EntryLogs (lid INTEGER PRIMARY KEY, uid integer, date date, "
-					+ "weight real, FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
-					+ "CHECK (weight > 0));")
-
-	### end init
-	####################################################################################################
-
-	# add multiple new users from CSV file (without using User Interface)
-	# each line of CSV file must be in form 'name,sex,birthday,height'
-	def newUser(self, filePath, dateFormat="%m/%d/%Y"):
-		data = read_csv(filePath)
-		for index,row in data.iterrows():
-			lastIndex = self.cursor.execute("SELECT MAX(uid) FROM Users;").fetchall()[0][0]
-			uid = int(lastIndex) + 1 if lastIndex is not None else 1
-			self.cursor.execute("INSERT INTO Users(uid,name,sex,birthday,height) VALUES (?,?,?,?,?)",
-					(uid, row['name'], row['sex'], datetime.strptime(row['birthday'], dateFormat), row['height']))
+	else:
+		print('Error: sex must be either Male or Female')
+		exit()
 
 
+# return the number of calories the user should consume to remain at their current weight
+# weight is in lbs, height is in inches
+def CaloricNeeds(sex, age, weight, height, activityLevel, units=('lbs', 'inches')):
+	activityLevelMultipliers = {'sedentary': 1.2, 'lightly active': 1.375, 'moderately active': 1.55,
+								'hard exercise': 1.725, 'very hard exercise': 1.9}
 
-	# add multiple EntryLogs *for previous users* from CSV file (without using User Interface)
-	# each line of CSV file must be in form 'uid,date,weight'
-	def addEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
-		data = read_csv(filePath)
-		for index,row in data.iterrows():
-			lastIndex = self.cursor.execute("SELECT MAX(lid) FROM EntryLogs;").fetchall()[0][0]
-			lid = int(lastIndex) + 1 if lastIndex is not None else 1
-			self.cursor.execute("INSERT INTO EntryLogs(lid, uid, date, weight) VALUES (?,?,?,?)",
-					(lid, row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
+	return activityLevelMultipliers[activityLevel]*BMR(sex, age, weight, height, units)
+
+
+if __name__ == '__main__':
+	sex = 'Female'
+	age = 20
+	weight = 56.425
+	height = 152.4
+	activityLevel = 'sedentary'
+	print(BMR(sex, age, weight, height))
+	print(CaloricNeeds(sex, age, weight, height, activityLevel))
