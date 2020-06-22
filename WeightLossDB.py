@@ -1,15 +1,13 @@
 import pyodbc
 import WeightCalculations as wc
 import GraphWLDB as gwl
-from datetime import date, datetime
-from pandas import read_csv, read_sql_query
+from datetime import datetime
+from pandas import read_csv
 
 
 # WeightLoss database manager
 class WeightLossDB(object):
 
-	####################################################################################################
-	### init
 	def __init__(self):
 
 		# connect to SQL Server
@@ -46,8 +44,7 @@ class WeightLossDB(object):
 					+ "weight real, FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
 					+ "CHECK (weight > 0));")
 
-	### end init
-	####################################################################################################
+
 
 	# add multiple new users from CSV file (without using User Interface)
 	# each line of CSV file must be in form 'name,sex,birthday,height'
@@ -61,7 +58,7 @@ class WeightLossDB(object):
 
 
 
-	# add multiple EntryLogs *for previous users* from CSV file (without using User Interface)
+	# add multiple EntryLogs for previous users from CSV file (without using User Interface)
 	# each line of CSV file must be in form 'uid,date,weight'
 	def addEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
 		data = read_csv(filePath)
@@ -70,3 +67,4 @@ class WeightLossDB(object):
 			lid = int(lastIndex) + 1 if lastIndex is not None else 1
 			self.cursor.execute("INSERT INTO EntryLogs(lid, uid, date, weight) VALUES (?,?,?,?)",
 					(lid, row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
+
