@@ -34,7 +34,11 @@ If one does not know their UserID (UID), then they can also search the database 
 All relevant results will be displayed so they can find their login information
 ![namelookup2](/images/namelookup2.png)
 
-Once the user has identified themself, they now mvoe to the main menu, where they have a variety of options to choose from
+Once the user has identified themself, they now move to the main menu, where they have a variety of options to choose from
 ![mainmenu](/images/mainmenu.png)
 
+The user has the option to graph their progress over a set course of months
+![graph](/images/graph.png)
 
+The user can also get their predicted weight on a given day using a weightloss schedule (lbs. lost per week)
+![weightestimator](/images/weightestimator.png)
