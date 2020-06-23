@@ -40,8 +40,8 @@ class WeightLossDB(object):
 			self.cursor.execute("CREATE TABLE Users (uid INTEGER PRIMARY KEY, name varchar(25), sex CHAR(1), "
 					+ "birthday date, height real, CHECK (sex in ('M', 'F') AND height > 0));")
 
-			self.cursor.execute("CREATE TABLE EntryLogs (lid INTEGER PRIMARY KEY, uid integer, date date, "
-					+ "weight real, FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
+			self.cursor.execute("CREATE TABLE EntryLogs (uid integer, date date, "
+					+ "weight real, PRIMARY KEY (uid, date), FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
 					+ "CHECK (weight > 0));")
 
 
@@ -63,8 +63,6 @@ class WeightLossDB(object):
 	def addEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
 		data = read_csv(filePath)
 		for index,row in data.iterrows():
-			lastIndex = self.cursor.execute("SELECT MAX(lid) FROM EntryLogs;").fetchall()[0][0]
-			lid = int(lastIndex) + 1 if lastIndex is not None else 1
-			self.cursor.execute("INSERT INTO EntryLogs(lid, uid, date, weight) VALUES (?,?,?,?)",
-					(lid, row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
+			self.cursor.execute("INSERT INTO EntryLogs(uid, date, weight) VALUES (?,?,?)",
+					(row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
 
