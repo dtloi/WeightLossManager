@@ -1,18 +1,18 @@
 # WeightLossManager
 A weight loss progress tracker, using SQL injections in Python. My primary motivation for this project was to teach myself the basics of database management while applying it to a programming language I was already quite comfortable using. Updates and additional features will be added over time.
 
-###<ins>File Descriptions</ins>
+###File Descriptions
 #### WeightLossDB.py:
 Handles basic access to the WeightLoss database. Add a new user or add entry logs for a previous user. Reads data from a CSV file when given the filepath.
 
 #### WeightLossUI.py:
-Runs a command-line User Interface so a user can interact with and update the database without using CSV files.
+Runs a command-line User Interface so a user can interact with and update the database without using CSV files. A tutorial of this program is provided further below.
 
 #### WeightCalculations.py:
-Performs supplementary calculations to find the user's BMR (Basal Metabolic Rate) and recommended calorie intake for a desired weight-loss plan.
+Performs supplementary calculations to find the user's BMR (Basal Metabolic Rate) and recommended calorie intake for a desired weight-loss plan. Can be called independently from WeightLossDB and WeightLossUI
 
 #### GraphWLDB.py:
-Creates visualization of the user's weight-loss progress over a period of time.
+Creates visualization of the user's weight-loss progress over a period of time. The starting and ending dates for the graph can be given as input, if no dates are given for input, the user's entire history will be graphed.
 
 
 ## User Interface Tutorial
