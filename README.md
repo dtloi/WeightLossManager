@@ -1,7 +1,7 @@
 # WeightLossManager
 A weight loss progress tracker, using SQL injections in Python. My primary motivation for this project was to teach myself the basics of database management while applying it to a programming language I was already quite comfortable using. Updates and additional features will be added over time.
 
-<ins>### File Descriptions</ins>
+###<ins>File Descriptions</ins>
 #### WeightLossDB.py:
 Handles basic access to the WeightLoss database. Add a new user or add entry logs for a previous user. Reads data from a CSV file when given the filepath.
 
