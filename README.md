@@ -16,7 +16,7 @@ Creates visualization of the user's weight-loss progress over a period of time.
 
 ## User Interface Tutorial
 In order to start the UI, one must simply run the RunManager.py file with no command-line arguments for Click. In order to interact with the menu, the user must simply type the number next to their desired option.
-![Startup Menu](/images/startup.png)
+![Startup Menu](/images/startup2.png)
 
 If it is the user's first time using the program, they can enter their information under the New User option
 ![New User](/images/newuser.png)
