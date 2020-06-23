@@ -25,7 +25,7 @@ A command-line User Interface so a user can interact with and update the databas
 
 ![Startup Menu](/images/startup.png)
 
-**If it is the user's first time using the program, they can enter their information under the New User option**
+**If this is the user's first time using the program, they can enter their information under the New User option**
 
 ![New User](/images/newuser0.png)
 
