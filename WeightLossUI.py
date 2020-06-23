@@ -47,16 +47,11 @@ class WeightLossUI(WeightLossDB):
 	# add the users's entry to the database with the date and their current weight
 	def addEntryLogFromUI(self, uid):
 
-		# create the log-ID IPK (lid) for this entry
-		self.cursor.execute("SELECT MAX(lid) FROM EntryLogs;")
-		oldIndex = self.cursor.fetchall()[0][0]
-		index = int(oldIndex) + 1 if oldIndex is not None else 1
-
 		# insert into database
 		date = input("Enter the date for your current entry (mm/dd/yyyy): ")
 		weight = float(input("Enter your weight for your current entry (in lbs): "))
-		self.cursor.execute( "INSERT INTO EntryLogs (lid, uid, date, weight) VALUES (?, ?, ?, ?);",
-							(index, uid, datetime.strptime(date, self.USformat), weight) )
+		self.cursor.execute( "INSERT INTO EntryLogs (uid, date, weight) VALUES (?, ?, ?);",
+							(uid, datetime.strptime(date, self.USformat), weight) )
 
 
 
@@ -128,9 +123,9 @@ class WeightLossUI(WeightLossDB):
 					print("\nThe following records were found:\n%s\n%s" % (data.to_string(index=False), self.border))
 
 					uid = int(input("\nPlease enter the UID number of your account, or press 0 to try again: "))
+					# if a valid option has been selected
 					if uid in data['uid'].tolist():
 						flag = False
-
 
 				else:
 					print("No records with the name %s were found, please re-enter your name." % name[1:-1])
@@ -199,7 +194,7 @@ class WeightLossUI(WeightLossDB):
 			print("Weight Estimator: calculate the user's weight on a given date at their current weight-loss rate (lbs. per week)")
 			print(self.border + "\n")
 			sleep(2)
-			self.loadFromUI(uid)
+			self.loadFromUI(uid)  # restart menu
 
 		else:
-			print("Error: user choice must be one of the numbers above"); exit()
+			print("Error: user choice must be one of the numbers above");  exit()
