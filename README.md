@@ -1,4 +1,4 @@
-# WeightLossManager
+# <ins>WeightLossManager</ins>
 A weight loss progress tracker, using SQL injections in Python. My primary motivation for this project was to teach myself the basics of database management while applying it to a programming language I was already quite comfortable using. Updates and additional features will be added over time.
 
 ### <ins>File Descriptions</ins>
@@ -15,11 +15,11 @@ Performs supplementary calculations to find the user's BMR (Basal Metabolic Rate
 Creates visualization of the user's weight-loss progress over a period of time. The starting and ending dates for the graph can be given as input, if no dates are given for input, the user's entire history will be graphed.
 
 
-## User Interface Tutorial
+## <ins>User Interface Tutorial</ins>
 In order to start the UI, one must simply run the RunManager.py file with no command-line arguments for Click. In order to interact with the menu, the user must simply type the number next to their desired option.
 ![Startup Menu](/images/startup.png)
 
-If it is the user's first time using the program, they can enter their information under the New User option
+**If it is the user's first time using the program, they can enter their information under the New User option
 ![New User](/images/newuser0.png)
 
 
@@ -41,5 +41,5 @@ Once the user has identified themself, they now move to the main menu, where the
 The user has the option to graph their progress over a set course of months
 ![graph](/images/graph.png)
 
-The user can also get their predicted weight on a given day using a weightloss schedule (lbs. lost per week)
+The user can also get their predicted weight on a given day using a weightloss schedule (lbs. lost per week)**
 ![weightestimator](/images/weightestimator.png)
