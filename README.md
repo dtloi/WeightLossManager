@@ -19,7 +19,7 @@ In order to start the UI, one must simply run the RunManager.py file with no com
 ![Startup Menu](/images/startup.png)
 
 If it is the user's first time using the program, they can enter their information under the New User option
-![New User](/images/newuser.png)
+![New User](/images/newuser0.png)
 
 
 They will then be prompted to enter their first entry, logging their weight and the date.
