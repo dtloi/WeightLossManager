@@ -36,6 +36,7 @@ Creates visualization of the user's weight-loss progress over a period of time. 
 ![namelookup2](/images/namelookup2.png)
 
 **Once the user has identified themself, they now move to the main menu, where they have a variety of options to choose from**
+
 ![mainmenu](/images/mainmenu.png)
 
 **The user has the option to graph their progress over a set course of months**
