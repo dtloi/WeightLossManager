@@ -1,4 +1,5 @@
 import pyodbc
+import re
 import WeightCalculations as wc
 import GraphWLDB as gwl
 from datetime import datetime
@@ -9,6 +10,12 @@ from pandas import read_csv
 class WeightLossDB(object):
 
 	def __init__(self):
+
+		# disallowed characters for usernames in database
+		self.userPattern = re.compile("^\.|&|=|_|'|-|\+|,|<|>|\(|\)| ")
+
+		# disallowed characters for passwords in database
+		self.passwordPattern = re.compile(" ")
 
 		# connect to SQL Server
 		self.connection = None
@@ -37,32 +44,41 @@ class WeightLossDB(object):
 		else:
 			print("WeightLoss database does not yet exist....creating...")
 			self.cursor.execute("CREATE DATABASE WeightLoss")
-			self.cursor.execute("CREATE TABLE Users (uid INTEGER PRIMARY KEY, name varchar(25), sex CHAR(1), "
-					+ "birthday date, height real, CHECK (sex in ('M', 'F') AND height > 0));")
+			self.cursor.execute("CREATE TABLE Users (uid INTEGER PRIMARY KEY, username varchar(16) NOT NULL UNIQUE, "
+				+ "password varbinary(150) NOT NULL, name varchar(25), sex char(1), birthday date, height real, "
+				+ "CHECK (sex in ('M', 'F') AND height > 0));")
 
 			self.cursor.execute("CREATE TABLE EntryLogs (uid integer, date date, "
 					+ "weight real, PRIMARY KEY (uid, date), FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE, "
 					+ "CHECK (weight > 0));")
 
 
-
-	# add multiple new users from CSV file (without using User Interface)
-	# each line of CSV file must be in form 'name,sex,birthday,height'
-	def newUser(self, filePath, dateFormat="%m/%d/%Y"):
-		data = read_csv(filePath)
-		for index,row in data.iterrows():
-			lastIndex = self.cursor.execute("SELECT MAX(uid) FROM Users;").fetchall()[0][0]
-			uid = int(lastIndex) + 1 if lastIndex is not None else 1
-			self.cursor.execute("INSERT INTO Users(uid,name,sex,birthday,height) VALUES (?,?,?,?,?)",
-					(uid, row['name'], row['sex'], datetime.strptime(row['birthday'], dateFormat), row['height']))
+#####################################################################################################################
 
 
-
-	# add multiple EntryLogs for previous users from CSV file (without using User Interface)
+	# add multiple EntryLogs for previous user from CSV file
 	# each line of CSV file must be in form 'uid,date,weight'
-	def addEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
-		data = read_csv(filePath)
-		for index,row in data.iterrows():
-			self.cursor.execute("INSERT INTO EntryLogs(uid, date, weight) VALUES (?,?,?)",
-					(row['uid'], datetime.strptime(row['date'], dateFormat), row['weight']))
+	def csvEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
+		# get User ID to input CSV data
+		uid = None
+		username = input("Enter your username: ")
+		pwd = input("Enter your password: ")
+		data = self.cursor.execute("SELECT uid FROM Users WHERE username=? AND password=HASHBYTES('SHA2_512', ?);",
+				(username, pwd)).fetchall()
 
+		# if the query produced a result
+		if len(data) != 0:
+			uid = int(data[0][0])
+
+		# return False if no query result exists
+		else:
+			return False
+
+		csv = read_csv(filePath)
+
+		# insert into database
+		for index,row in csv.iterrows():
+			self.cursor.execute("INSERT INTO EntryLogs(uid, date, weight) VALUES (?,?,?)",
+					(uid, datetime.strptime(row['date'], dateFormat), row['weight']))
+
+		return True
