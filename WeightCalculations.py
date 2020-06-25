@@ -48,7 +48,7 @@ def BMR(sex, age, weight, height, units=('lbs', 'inches')):
 
 # return the number of calories the user should consume to remain at their current weight
 # weight is in lbs, height is in inches
-def CaloricNeeds(sex, age, weight, height, activityLevel, units=('lbs', 'inches')):
+def CaloricNeeds(sex, age, weight, height, activityLevel='sedentary', units=('lbs', 'inches')):
 	activityLevelMultipliers = {'sedentary': 1.2, 'lightly active': 1.375, 'moderately active': 1.55,
 								'hard exercise': 1.725, 'very hard exercise': 1.9}
 
