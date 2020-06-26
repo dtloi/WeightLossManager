@@ -31,7 +31,7 @@ A command-line User Interface so a user can interact with and update the databas
 
 ![New User1](/images/newuserImage1.png)
 
-![New User2](/images/newuserImage2/png)
+![New User2](/images/newuserImage2.png)
 
 **The user can then use their username and password to access their account. They will then be brought to the main menu, where they can access various program features.**
 ![user lookup](/images/userLookupImage.png)
