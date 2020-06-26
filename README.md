@@ -25,8 +25,7 @@ A command-line User Interface so a user can interact with and update the databas
 
 ![Startup Menu](/images/startupImage.png)
 
-**If this is the user's first time using the program, they can enter their information under the New User option**
-**They must first make a new username and password. For security reasons, the password will not be displayed on the terminal as the user types.**
+**If this is the user's first time using the program, they can enter their information under the New User option. They must first make a new username and password. For security reasons, the password will not be displayed on the terminal as the user types.**
 
 
 ![New User1](/images/newuserImage1.png)
@@ -34,6 +33,7 @@ A command-line User Interface so a user can interact with and update the databas
 ![New User2](/images/newuserImage2.png)
 
 **The user can then use their username and password to access their account. They will then be brought to the main menu, where they can access various program features.**
+
 ![user lookup](/images/userLookupImage.png)
 
 **The user can enter log entries recording the date and their weight from the main menu**
