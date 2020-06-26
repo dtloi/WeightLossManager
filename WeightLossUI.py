@@ -252,19 +252,19 @@ class WeightLossUI(WeightLossDB):
 			elif userChoice == 3:
 
 				# the user's current weight
-				weightNow = Decimal(round(self.__weightToday(uid), 2))
+				weightNow = Decimal(round(self.__weightToday(uid), 1))
 
 				futureDate = input("Enter the future date for your desired weight-estimation (mm/dd/yyyy): ")
-				weeklyLoss = Decimal(round(self.__weeklyLoss(), 2))
+				weeklyLoss = Decimal(round(self.__weeklyLoss(), 1))
 
 				# the amount of weight lost by the user
-				weightLoss = Decimal(round(wc.lbsLost(futureDate, weeklyLoss, dateFormat=self.USformat), 2))
+				weightLoss = round(wc.lbsLost(futureDate, weeklyLoss, dateFormat=self.USformat), 1)
 
 				# the user's weight on the future date
-				weightLater = weightNow - weightLoss
+				weightLater = round(weightNow - weightLoss, 1)
 
-				print( "\nOn %s at the rate of %s lbs per week, you will have lost %s lbs." % (futureDate, weeklyLoss, weightLoss))
-				print("%s --> %s" % (weightNow, weightLater))
+				print( "\nOn %s at the rate of %1.1f lbs per week, you will have lost %.1f lbs." % (futureDate, weeklyLoss, weightLoss))
+				print("%.1f --> %.1f" % (weightNow, weightLater))
 				print(self.border + "\n")
 
 			# display the necessary caloric intake for a user given their desired weight loss schedule
@@ -281,11 +281,11 @@ class WeightLossUI(WeightLossDB):
 				# calculate user's maintenance calories
 				# (their daily calorie intake at which they will remain their current weight)
 				caloriesMaintain = wc.CaloricNeeds(df['sex'].values[0], age, weightNow, df['height'].values[0])
-				print("In order to maintain your current weight of %s lbs., you need to eat %s calories a day."
+				print("In order to maintain your current weight of %.1f lbs., you need to eat %.0f calories a day."
 						% (Decimal(weightNow), Decimal(round(caloriesMaintain, 0))))
 
 				# a person loses about a pound per week by cutting their maintenance calories by 500
-				print("If you wish to lose %s lbs. per week, then you should consume %s calories a day."
+				print("If you wish to lose %.1f lbs. per week, then you should consume %.0f calories a day."
 						% (Decimal(weeklyLoss), Decimal(round(caloriesMaintain - (weeklyLoss*500),0))))
 
 			# print help messages
@@ -297,7 +297,6 @@ class WeightLossUI(WeightLossDB):
 					+ "as well as how many calories they should consume to lose a desired amount of weight per week")
 				print(self.border + "\n")
 				sleep(2)
-				self.__mainMenu(uid)  # restart menu
 
 			# if the user wishes to leave the main menu
 			elif userChoice == 6:
