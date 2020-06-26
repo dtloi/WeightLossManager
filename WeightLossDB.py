@@ -2,6 +2,7 @@ import pyodbc
 import re
 import WeightCalculations as wc
 import GraphWLDB as gwl
+import getpass
 from datetime import datetime
 from pandas import read_csv
 
@@ -62,7 +63,9 @@ class WeightLossDB(object):
 		# get User ID to input CSV data
 		uid = None
 		username = input("Enter your username: ")
-		pwd = input("Enter your password: ")
+		# password hidden from command-line when typed
+		pwd = getpass.getpass(prompt="Enter your password: ")
+
 		data = self.cursor.execute("SELECT uid FROM Users WHERE username=? AND password=HASHBYTES('SHA2_512', ?);",
 				(username, pwd)).fetchall()
 
