@@ -18,8 +18,6 @@ def main(csv):
 	# add a user's entry logs from CSV file to database
 	else:
 		wloss = WeightLossDB()
-		username = input("Please enter your username: ")
-		password = input("Please enter your password: ")
 
 		# if the CSV data was successfully inserted into database
 		if wloss.csvEntryLog(csv):
