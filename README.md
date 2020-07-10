@@ -45,13 +45,13 @@ A command-line User Interface so a user can interact with and update the databas
 
 ![csv_entry1](/images/csventryImage1.png)
 
-**As we can see, the entries have been successfully inserted into the database**
-
-![sql](images/tableImage.png)
-
 **The user must first enter their login information**
 
 ![csv_entry2](/images/csventryImage2.png)
+
+**As we can see, the entries have been successfully inserted into the database**
+
+![sql](images/tableImage.png)
 
 **The user also has the option to graph their progress over a set course of months, compared to their projected weight using a weight loss plan (losing x pounds per week)**
 
