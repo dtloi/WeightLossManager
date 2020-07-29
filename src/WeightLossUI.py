@@ -1,8 +1,8 @@
 import pyodbc
-import re
 import getpass
 import WeightCalculations as wc
 import GraphWLDB as gwl
+from re import findall
 from datetime import date, datetime, timedelta
 from pandas import read_csv, read_sql_query, to_datetime
 from WeightLossDB import WeightLossDB
@@ -54,8 +54,6 @@ class WeightLossUI(WeightLossDB):
 			print("Error: please choose one of the valid startup options")
 
 
-#####################################################################################################################
-
 
 	# get username from UI, check username character conditions
 	def __username(self):
@@ -65,7 +63,7 @@ class WeightLossUI(WeightLossDB):
 			username = input("Enter username: ")
 
 			# match illegal username characters
-			if len(re.findall(self.userPattern, username)) > 0:
+			if len(findall(self.userPattern, username)) > 0:
 				print("Error: username cannot start with a period, cannot contain spaces, and "
 					+ "cannot contain the following characters: & = _ ' - + , < > ( )")
 
@@ -74,8 +72,6 @@ class WeightLossUI(WeightLossDB):
 
 		return username
 
-
-#####################################################################################################################
 
 
 	# get password from UI, check password character conditions
@@ -87,7 +83,7 @@ class WeightLossUI(WeightLossDB):
 			pwd = getpass.getpass(prompt="Enter password: ")
 
 			# match illegal password characters
-			if len(re.findall(self.passwordPattern, pwd)) > 0:
+			if len(findall(self.passwordPattern, pwd)) > 0:
 				print("Error: password cannot contain spaces")
 
 			else:
@@ -95,8 +91,6 @@ class WeightLossUI(WeightLossDB):
 
 		return pwd
 
-
-#####################################################################################################################
 
 
 	# retrieve the User ID (uid) for a user's account
@@ -112,8 +106,6 @@ class WeightLossUI(WeightLossDB):
 		return uid
 
 
-#####################################################################################################################
-
 
 	# add the users's entry to the database with the date and their current weight
 	def __addEntryLog(self, uid):
@@ -125,8 +117,6 @@ class WeightLossUI(WeightLossDB):
 							(uid, datetime.strptime(date, self.USformat), weight) )
 
 
-#####################################################################################################################
-
 
 	# enter a new user into the WeightLoss database
 	# returns the new user's uid
@@ -137,7 +127,7 @@ class WeightLossUI(WeightLossDB):
 
 		name = input("Name: ")
 		sex = input("Sex (M/F): ")
-		height = input("Height (in inches): ");
+		height = input("Height (in inches): ")
 
 		# convert user's birthday to datetime format
 		birthday = input("Birthdate (mm/dd/yyyy): ");  print()
@@ -155,8 +145,6 @@ class WeightLossUI(WeightLossDB):
 		return uid
 
 
-#####################################################################################################################
-
 
 	# read the number of pounds per week the user would like to use from UI
 	def __weeklyLoss(self):
@@ -166,8 +154,6 @@ class WeightLossUI(WeightLossDB):
 
 		return weeklyLoss
 
-
-#####################################################################################################################
 
 
 	# return the weight of the user on today's date
@@ -188,9 +174,7 @@ class WeightLossUI(WeightLossDB):
 		return float(data[0][0])
 
 
-#####################################################################################################################
 
-	
 	# brings user to the main menu so they can access application features
 	def __mainMenu(self, uid):
 		self.cursor.execute("SELECT username FROM Users WHERE uid=?;", (uid))
@@ -212,91 +196,19 @@ class WeightLossUI(WeightLossDB):
 
 			# graph user's progress
 			elif userChoice == 2:
-				# read query results into pandas dataframe
-				graphDF = read_sql_query("SELECT date, weight FROM EntryLogs WHERE uid=? ORDER BY CONVERT(DATE, date) ASC;",
-									con=self.connection, params=(uid,))
-				dateDF = graphDF.copy()
-				dateDF['date'] = to_datetime(dateDF['date'])
-				name = self.cursor.execute("SELECT name FROM Users WHERE uid=?;", (uid)).fetchall()[0][0]
-
-				# get required graph information
-				print("\nYour progress will be graphed...")
-				weeklyLoss = self.__weeklyLoss()
-				startDate = input("Enter the starting date for the graph (mm/dd/yyyy): ").split("/")
-				endDate = input("Enter the ending date for the graph (mm/dd/yyyy): ").split("/")
-
-				# if dates input does not contain 0's for single digit months or single digit days, add them
-				# (for string matching purposes)
-				for i in range(len(startDate)-1):
-					if len(startDate[i]) == 1:
-						startDate[i] = "0" + startDate[i]
-					if len(endDate[i]) == 1:
-						endDate[i] = "0" + endDate[i]
-
-				# reformat into datetime-style string
-				startDate = startDate[2] + "-" + startDate[0] + "-" + startDate[1]
-				endDate = endDate[2] + "-" + endDate[0] + "-" + endDate[1]
-
-				# adjust end date by one day (for graph-padding)
-				startDateDT = datetime.strptime(startDate, "%Y-%m-%d") - timedelta(1)
-				endDateDT = datetime.strptime(endDate, "%Y-%m-%d")
-
-				# get the start and end dates for graphing
-				startIndex = dateDF[dateDF.date >= startDateDT].first_valid_index()
-				endIndex = dateDF[dateDF.date >= endDateDT].first_valid_index()
-
-				graphDF = graphDF.truncate(before=startIndex, after=endIndex)
-				gwl.GraphByPlan(graphDF, name, weeklyLoss)  # test graph by month
+				self.__prepGraph(uid)
 
 			# display weight-loss estimation for a given date (in lbs.)
 			elif userChoice == 3:
-
-				# the user's current weight
-				weightNow = Decimal(round(self.__weightToday(uid), 1))
-
-				futureDate = input("Enter the future date for your desired weight-estimation (mm/dd/yyyy): ")
-				weeklyLoss = Decimal(round(self.__weeklyLoss(), 1))
-
-				# the amount of weight lost by the user
-				weightLoss = round(wc.lbsLost(futureDate, weeklyLoss, dateFormat=self.USformat), 1)
-
-				# the user's weight on the future date
-				weightLater = round(weightNow - weightLoss, 1)
-
-				print( "\nOn %s at the rate of %1.1f lbs per week, you will have lost %.1f lbs." % (futureDate, weeklyLoss, weightLoss))
-				print("%.1f --> %.1f" % (weightNow, weightLater))
-				print(self.border + "\n")
+				self.__weightLossEstimator(uid)
 
 			# display the necessary caloric intake for a user given their desired weight loss schedule
 			elif userChoice == 4:
-				weeklyLoss = self.__weeklyLoss()
-				weightNow = self.__weightToday(uid)
-				df = read_sql_query("SELECT sex,birthday,height FROM Users WHERE uid=?;", con=self.connection, params=(uid,))
-
-				# get user's age (rounded down regardless of months,days)
-				date = datetime.strptime(df['birthday'].values[0], "%Y-%m-%d").date()
-				timeDifference = datetime.today().date() - date
-				age = timeDifference.days // 365
-
-				# calculate user's maintenance calories
-				# (their daily calorie intake at which they will remain their current weight)
-				caloriesMaintain = wc.CaloricNeeds(df['sex'].values[0], age, weightNow, df['height'].values[0])
-				print("In order to maintain your current weight of %.1f lbs., you need to eat %.0f calories a day."
-						% (Decimal(weightNow), Decimal(round(caloriesMaintain, 0))))
-
-				# a person loses about a pound per week by cutting their maintenance calories by 500
-				print("If you wish to lose %.1f lbs. per week, then you should consume %.0f calories a day."
-						% (Decimal(weeklyLoss), Decimal(round(caloriesMaintain - (weeklyLoss*500),0))))
+				self.__caloricIntake(uid)
 
 			# print help messages
 			elif userChoice == 5:
-				print("\n" + self.border + "\nAdd New Entry: adds a new log entry to record the date and the user's weight")
-				print("Graph Progress: graphs the user's weight progress over a period of time")
-				print("Weight Estimator: calculate the user's weight on a given date at their current weight-loss rate (lbs. per week)")
-				print("Calorie Tracker:  calculate the calories the user should consume to maintain their current weight, "
-					+ "as well as how many calories they should consume to lose a desired amount of weight per week")
-				print(self.border + "\n")
-				sleep(2)
+				self.__help()
 
 			# if the user wishes to leave the main menu
 			elif userChoice == 6:
@@ -304,3 +216,97 @@ class WeightLossUI(WeightLossDB):
 
 			else:
 				print("Error: user choice must be one of the numbers above")
+
+
+
+	# fetch data to graph the user's progress in comparison to a designated weight-loss plan
+	def __prepGraph(self, uid):
+		# read query results into pandas dataframe
+		graphDF = read_sql_query("SELECT date, weight FROM EntryLogs WHERE uid=? ORDER BY CONVERT(DATE, date) ASC;",
+							con=self.connection, params=(uid,))
+		dateDF = graphDF.copy()
+		dateDF['date'] = to_datetime(dateDF['date'])
+		name = self.cursor.execute("SELECT name FROM Users WHERE uid=?;", (uid)).fetchall()[0][0]
+
+		# get required graph information
+		print("\nYour progress will be graphed...")
+		weeklyLoss = self.__weeklyLoss()
+		startDate = input("Enter the starting date for the graph (mm/dd/yyyy): ").split("/")
+		endDate = input("Enter the ending date for the graph (mm/dd/yyyy): ").split("/")
+
+		# if dates input does not contain 0's for single digit months or single digit days, add them
+		# (for string matching purposes)
+		for i in range(len(startDate)-1):
+			if len(startDate[i]) == 1:
+				startDate[i] = "0" + startDate[i]
+			if len(endDate[i]) == 1:
+				endDate[i] = "0" + endDate[i]
+
+		# reformat into datetime-style string
+		startDate = startDate[2] + "-" + startDate[0] + "-" + startDate[1]
+		endDate = endDate[2] + "-" + endDate[0] + "-" + endDate[1]
+
+		# adjust end date by one day (for graph-padding)
+		startDateDT = datetime.strptime(startDate, "%Y-%m-%d") - timedelta(1)
+		endDateDT = datetime.strptime(endDate, "%Y-%m-%d")
+
+		# get the start and end dates for graphing
+		startIndex = dateDF[dateDF.date >= startDateDT].first_valid_index()
+		endIndex = dateDF[dateDF.date >= endDateDT].first_valid_index()
+
+		graphDF = graphDF.truncate(before=startIndex, after=endIndex)
+		gwl.GraphByPlan(graphDF, name, weeklyLoss)  # test graph by month
+
+
+
+	# how much weight will the user lose following a certain weight-loss plan?
+	def __weightLossEstimator(self, uid):
+		# the user's current weight
+		weightNow = Decimal(round(self.__weightToday(uid), 1))
+
+		futureDate = input("Enter the future date for your desired weight-estimation (mm/dd/yyyy): ")
+		weeklyLoss = Decimal(round(self.__weeklyLoss(), 1))
+
+		# the amount of weight lost by the user
+		weightLoss = round(wc.lbsLost(futureDate, weeklyLoss, dateFormat=self.USformat), 1)
+
+		# the user's weight on the future date
+		weightLater = round(weightNow - weightLoss, 1)
+
+		print( "\nOn %s at the rate of %1.1f lbs per week, you will have lost %.1f lbs." % (futureDate, weeklyLoss, weightLoss))
+		print("%.1f --> %.1f" % (weightNow, weightLater))
+		print(self.border + "\n")
+
+
+
+	# determine user's required daily caloric intake based on their desired weekly weight-loss
+	def __caloricIntake(self, uid):
+		weeklyLoss = self.__weeklyLoss()
+		weightNow = self.__weightToday(uid)
+		df = read_sql_query("SELECT sex,birthday,height FROM Users WHERE uid=?;", con=self.connection, params=(uid,))
+
+		# get user's age (rounded down regardless of months,days)
+		date = datetime.strptime(df['birthday'].values[0], "%Y-%m-%d").date()
+		timeDifference = datetime.today().date() - date
+		age = timeDifference.days // 365
+
+		# calculate user's maintenance calories
+		# (their daily calorie intake at which they will remain their current weight)
+		caloriesMaintain = wc.CaloricNeeds(df['sex'].values[0], age, weightNow, df['height'].values[0])
+		print("In order to maintain your current weight of %.1f lbs., you need to eat %.0f calories a day."
+				% (Decimal(weightNow), Decimal(round(caloriesMaintain, 0))))
+
+		# a person loses about a pound per week by cutting their maintenance calories by 500
+		print("If you wish to lose %.1f lbs. per week, then you should consume %.0f calories a day."
+				% (Decimal(weeklyLoss), Decimal(round(caloriesMaintain - (weeklyLoss*500),0))))
+
+
+	# display Help messages for the user
+	def __help(self):
+		print("\n" + self.border + "\nAdd New Entry: adds a new log entry to record the date and the user's weight")
+		print("Graph Progress: graphs the user's weight progress over a period of time")
+		print("Weight Estimator: calculate the user's weight on a given date at their current weight-loss rate (lbs. per week)")
+		print("Calorie Tracker:  calculate the calories the user should consume to maintain their current weight, "
+			+ "as well as how many calories they should consume to lose a desired amount of weight per week")
+		print(self.border + "\n")
+		sleep(2)
