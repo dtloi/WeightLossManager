@@ -1,8 +1,8 @@
 import pyodbc
-import re
 import WeightCalculations as wc
 import GraphWLDB as gwl
 import getpass
+from re import compile
 from datetime import datetime
 from pandas import read_csv
 
@@ -13,10 +13,10 @@ class WeightLossDB(object):
 	def __init__(self):
 
 		# disallowed characters for usernames in database
-		self.userPattern = re.compile("^\.|&|=|_|'|-|\+|,|<|>|\(|\)| ")
+		self.userPattern = compile(r"^\.|&|=|_|'|-|\+|,|<|>|\(|\)| ")
 
 		# disallowed characters for passwords in database
-		self.passwordPattern = re.compile(" ")
+		self.passwordPattern = compile(r" ")
 
 		# connect to SQL Server
 		self.connection = None
@@ -54,18 +54,20 @@ class WeightLossDB(object):
 					+ "CHECK (weight > 0));")
 
 
-#####################################################################################################################
-
 
 	# add multiple EntryLogs for previous user from CSV file
 	# each line of CSV file must be in form 'uid,date,weight'
+	# returns boolean to log success/failure of storage
 	def csvEntryLog(self, filePath, dateFormat="%m/%d/%Y"):
 		# get User ID to input CSV data
 		uid = None
+
 		username = input("Enter your username: ")
+
 		# password hidden from command-line when typed
 		pwd = getpass.getpass(prompt="Enter your password: ")
 
+		# use SHA2_512 hashing algorithm to securely store hashed passwords
 		data = self.cursor.execute("SELECT uid FROM Users WHERE username=? AND password=HASHBYTES('SHA2_512', ?);",
 				(username, pwd)).fetchall()
 
@@ -79,8 +81,8 @@ class WeightLossDB(object):
 
 		csv = read_csv(filePath)
 
-		# insert into database
-		for index,row in csv.iterrows():
+		# insert into database (use dummy variable for index since we don't need it)
+		for _,row in csv.iterrows():
 			self.cursor.execute("INSERT INTO EntryLogs(uid, date, weight) VALUES (?,?,?)",
 					(uid, datetime.strptime(row['date'], dateFormat), row['weight']))
 
