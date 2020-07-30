@@ -1,14 +1,13 @@
 # <ins>WeightLossManager</ins>
 A weight loss progress tracker, using SQL injections in Python. My primary motivation for this project was to teach myself the basics of database management while applying it to a programming language I was already quite comfortable using. I have also provided a tutorial with pictures, shown below.
 
-Source code can be found at [https://github.com/andrewStenger/WeightLossManager](https://github.com/andrewStenger/WeightLossManager)
+Source code can be found at [https://github.com/andrewStenger/WeightLossManager](https://github.com/andrewStenger/WeightLossManager) <br>
 Python 3 can be downloaded at [https://installpython3.com/](https://installpython3.com/)
 
 ### <ins> Dependencies </ins>
 WeightLossManager supports both Python 2 and 3.
-The following Python libraries must be installed:  click, getpass, matplotlib, pandas, pyodbc, re.
-Since pyodbc requires an [ODBC Database](https://en.wikipedia.org/wiki/Open_Database_Connectivity), the user must provide Click arguments for both the ODBC driver name and the server name.
-More information about ODBC databases can be found [here](https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-ver15).
+The following Python libraries must be installed:  click, getpass, matplotlib, pandas, pyodbc, re. <br>
+Since pyodbc requires an [ODBC Database](https://en.wikipedia.org/wiki/Open_Database_Connectivity), the user must provide Click arguments for both the ODBC driver name and the server name. <br> More information about ODBC databases can be found [here](https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-ver15).
 
 ### <ins>File Descriptions</ins>
 
