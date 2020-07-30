@@ -7,7 +7,8 @@ Python 3 can be downloaded at [https://installpython3.com/](https://installpytho
 ### <ins> Dependencies </ins>
 Weight-Loss Manager supports both Python 2 and 3.
 The following Python libraries must be installed:  click, getpass, matplotlib, pandas, pyodbc, re.
-Since pyodbc requires an [ODBC Database](https://en.wikipedia.org/wiki/Open_Database_Connectivity), the user must provide Click arguments for both the ODBC driver name and the server name. More information about ODBC databases can be found [here](https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-ver15).
+Since pyodbc requires an [ODBC Database](https://en.wikipedia.org/wiki/Open_Database_Connectivity), the user must provide Click arguments for both the ODBC driver name and the server name.
+More information about ODBC databases can be found [here](https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-ver15).
 
 ### <ins>File Descriptions</ins>
 
