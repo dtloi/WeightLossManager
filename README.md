@@ -2,7 +2,7 @@
 A weight loss progress tracker, using SQL queries with Python. My primary motivation for this project was to teach myself the basics of database management while applying it to a programming language I was already quite comfortable using. I have also provided a tutorial with pictures, shown below.
 
 Source code can be found at [https://github.com/andrewStenger/WeightLossManager](https://github.com/andrewStenger/WeightLossManager) <br>
-Python 3 can be downloaded at [https://installpython3.com/](https://installpython3.com/)
+Python 3 can be downloaded at [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 ### <ins> Dependencies </ins>
 WeightLossManager supports Python 3.
