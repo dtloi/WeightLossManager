@@ -5,7 +5,7 @@ Source code can be found at [https://github.com/andrewStenger/WeightLossManager]
 Python 3 can be downloaded at [https://installpython3.com/](https://installpython3.com/)
 
 ### <ins> Dependencies </ins>
-WeightLossManager supports Python 2 and 3.
+WeightLossManager supports Python 3.
 The following Python libraries must be installed:  click, getpass, matplotlib, pandas, pyodbc, re. <br>
 Since pyodbc requires an [ODBC Database](https://en.wikipedia.org/wiki/Open_Database_Connectivity), the user must provide Click arguments for both the ODBC driver name and the server name. <br> More information about ODBC databases can be found [here](https://docs.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-ver15).
 
